@@ -1,7 +1,8 @@
-import React from 'react';
+import React from 'react'
+import AppContainer from './components/AppContainer'
 
 const App: React.FC = () => {
-  return <div id='app'>Modify me!</div>;
-};
+  return <AppContainer />
+}
 
-export default App;
+export default App

@@ -1,11 +1,9 @@
 /* eslint-env node */
+import { builtinModules } from 'module'
+import react from '@vitejs/plugin-react'
+import { chrome } from '../../.electron-vendors.cache.json'
 
-import {chrome} from '../../.electron-vendors.cache.json';
-import {join} from 'path';
-import {builtinModules} from 'module';
-import react from '@vitejs/plugin-react';
-
-const PACKAGE_ROOT = __dirname;
+const PACKAGE_ROOT = __dirname
 
 /**
  * @type {import('vite').UserConfig}
@@ -14,11 +12,6 @@ const PACKAGE_ROOT = __dirname;
 const config = {
   mode: process.env.MODE,
   root: PACKAGE_ROOT,
-  resolve: {
-    alias: {
-      '/@/': join(PACKAGE_ROOT, 'src') + '/',
-    },
-  },
   plugins: [react()],
   base: '',
   server: {
@@ -32,13 +25,11 @@ const config = {
     outDir: 'dist',
     assetsDir: '.',
     rollupOptions: {
-      external: [
-        ...builtinModules,
-      ],
+      external: [...builtinModules],
     },
     emptyOutDir: true,
     brotliSize: false,
   },
-};
+}
 
-export default config;
+export default config

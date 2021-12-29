@@ -1,14 +1,9 @@
+import { IpcChannelLabel } from "../common/consts";
+
 interface Window {
-    /**
-     * Expose Environment versions.
-     * @example
-     * console.log( window.versions )
-     */
-    readonly versions: NodeJS.ProcessVersions;
-    /**
-     * Safe expose node.js API
-     * @example
-     * window.nodeCrypto('data')
-     */
-    readonly nodeCrypto: { sha256sum(data: import("crypto").BinaryLike): string; };
+  readonly ipc: {
+    send: <T>(channel: IpcChannelLabel, data: T) => void;
+    receive: (channel: IpcChannelLabel, cb: (...args: any[]) => void) => void;
+  }
+  readonly monacoLoader: { path: string; };
 }

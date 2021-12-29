@@ -1,7 +1,6 @@
-import {contextBridge} from 'electron';
-
-import type {BinaryLike} from 'crypto';
-import {createHash} from 'crypto';
+import { contextBridge, ipcRenderer } from 'electron'
+import { IpcChannelLabel } from '../../common/consts'
+import { getMonacoPath } from './monaco'
 
 /**
  * The "Main World" is the JavaScript context that your main renderer code runs in.
@@ -10,31 +9,24 @@ import {createHash} from 'crypto';
  * @see https://www.electronjs.org/docs/api/context-bridge
  */
 
-/**
- * After analyzing the `exposeInMainWorld` calls,
- * `packages/preload/exposedInMainWorld.d.ts` file will be generated.
- * It contains all interfaces.
- * `packages/preload/exposedInMainWorld.d.ts` file is required for TS is `renderer`
- *
- * @see https://github.com/cawa-93/dts-for-context-bridge
- */
-
-/**
- * Expose Environment versions.
- * @example
- * console.log( window.versions )
- */
-contextBridge.exposeInMainWorld('versions', process.versions);
-
-/**
- * Safe expose node.js API
- * @example
- * window.nodeCrypto('data')
- */
-contextBridge.exposeInMainWorld('nodeCrypto', {
-  sha256sum(data: BinaryLike) {
-    const hash = createHash('sha256');
-    hash.update(data);
-    return hash.digest('hex');
+// Expose protected methods that allow the renderer process to use
+// the ipcRenderer without exposing the entire object
+contextBridge.exposeInMainWorld('ipc', {
+  send: (channel: string, data: any) => {
+    const validChannels = [IpcChannelLabel.Menu]
+    if (validChannels.includes(channel as IpcChannelLabel)) {
+      ipcRenderer.send(channel, data)
+    }
   },
-});
+  receive: (channel: string, func: any) => {
+    const validChannels = [IpcChannelLabel.Menu]
+    if (validChannels.includes(channel as IpcChannelLabel)) {
+      // Deliberately strip event as it includes `sender`
+      ipcRenderer.on(channel, (event, ...args) => func(...args))
+    }
+  },
+})
+
+contextBridge.exposeInMainWorld('monacoLoader', {
+  path: getMonacoPath(),
+})
